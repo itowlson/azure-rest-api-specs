@@ -9698,8 +9698,7 @@
         }
       },
       "required": ["poolId","startTime","endTime","vmSize","totalCoreHours","dataIngressGiB","dataEgressGiB"],
-      "summary": "Usage metrics for a pool across an aggregation interval.",
-      "description" : "If you do not specify a $filter clause including a poolId, the response includes all pools that existed in the account in the time range of the returned aggregation intervals. If not specified, the startTime and endTime filters default to the start and end times of the last aggregation interval currently available; that is, only the last aggregation interval is returned."
+      "summary": "Usage metrics for a pool across an aggregation interval."
     },
     "PoolListPoolUsageMetricsResult": {
       "properties": {
