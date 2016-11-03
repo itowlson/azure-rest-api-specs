@@ -10766,7 +10766,7 @@
         "autoPoolIdPrefix": {
           "type": "string",
           "title": "A prefix to be added to the unique identifier when a pool is automatically created.",
-          "description": "The prefix can be up to 20 characters long."
+          "description": "The Batch service assigns each auto pool a unique identifier on creation. To distinguish between pools created for different purposes, you can specify this element to add a prefix to the id that is assigned. The prefix can be up to 20 characters long."
         },
         "poolLifetimeOption": {
           "type": "string",
@@ -10780,7 +10780,8 @@
         },
         "keepAlive": {
           "type": "boolean",
-          "title": "Whether to keep an auto pool alive after its lifetime expires."
+          "title": "Whether to keep an auto pool alive after its lifetime expires.",
+          "description": "If false, the Batch service deletes the pool once its lifetime (as determined by the poolLifetimeOption setting) expires; that is, when the job or job schedule completes. If true, the Batch service does not delete the pool automatically. It is up to the user to delete auto pools created with this option."
         },
         "pool": {
           "$ref": "#/definitions/PoolSpecification",
@@ -10799,7 +10800,7 @@
         },
         "autoPoolSpecification": {
           "$ref": "#/definitions/AutoPoolSpecification",
-          "title": "Characteristics for a temporary 'auto pool'. The Batch service will create this auto pool when the job is submitted.",
+          "title": "Characteristics for a temporary 'auto pool'. The Batch service will create this auto pool and run all the tasks of the job will run on it, and will delete the pool once the job has completed (subject to the auto pool settings).",
           "description": "You must specify either poolId or autoPoolSpecification, but not both."
         }
       },
@@ -10822,28 +10823,52 @@
           "type": "boolean",
           "title": "The flag that determines if this job will use tasks with dependencies."
         },
+        "onAllTasksComplete": {
+          "type": "string",
+          "title": "The action the Batch service should take when all tasks in a job created under this schedule are in the completed state.",
+          "description": "Note that if a job contains no tasks, then all tasks are considered complete. This option is therefore most commonly used with a job manager task; if you want to use automatic job termination without a job manager, you should initially set onAllTasksComplete to noaction and update the job properties to set onAllTasksComplete to terminatejob once you have finished adding tasks. The default is noaction.",
+          "enum": [
+            "noAction",
+            "terminateJob"
+          ],
+          "x-ms-enum": { "name": "OnAllTasksComplete", "modelAsString": false }
+        },
+        "onTaskFailure": {
+          "type": "string",
+          "title": "The action the Batch service should take when any task fails in a job created under this schedule. A task is considered to have failed if it completes with a non-zero exit code and has exhausted its retry count, or if it had a scheduling error.",
+          "description": "The default is noaction.",
+          "enum": [
+            "noAction",
+            "performExitOptionsJobAction"
+          ],
+          "x-ms-enum": { "name": "OnTaskFailure", "modelAsString": false }
+        },
         "constraints": {
           "$ref": "#/definitions/JobConstraints",
           "title": "The execution constraints for jobs created under this schedule."
         },
         "jobManagerTask": {
           "$ref": "#/definitions/JobManagerTask",
-          "title": "The details of a Job Manager task to be launched when a job is started under this schedule."
+          "title": "The details of a Job Manager task to be launched when a job is started under this schedule.",
+          "description": "If the job does not specify a Job Manager task, the user must explicitly add tasks to the job using the Task API. If the job does specify a Job Manager task, the Batch service creates the Job Manager task when the job is created, and will try to schedule the Job Manager task before scheduling other tasks in the job."
         },
         "jobPreparationTask": {
           "$ref": "#/definitions/JobPreparationTask",
-          "title": "The Job Preparation task for jobs created under this schedule."
+          "title": "The Job Preparation task for jobs created under this schedule.",
+          "description": "If a job has a Job Preparation task, the Batch service will run the Job Preparation task on a compute node before starting any tasks of that job on that compute node."
         },
         "jobReleaseTask": {
           "$ref": "#/definitions/JobReleaseTask",
-          "title": "The Job Release task for jobs created under this schedule."
+          "title": "The Job Release task for jobs created under this schedule.",
+          "description": "The primary purpose of the Job Release task is to undo changes to compute nodes made by the Job Preparation task. Example activities include deleting local files, or shutting down services that were started as part of job preparation. A Job Release task cannot be specified without also specifying a Job Preparation task for the job. The Batch service runs the Job Release task on the compute nodes that have run the Job Preparation task."
         },
         "commonEnvironmentSettings": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/EnvironmentSetting"
           },
-          "title": "A list of common environment variable settings. These environment variables are set for all tasks in jobs created under this schedule (including the Job Manager, Job Preparation and Job Release tasks)."
+          "title": "A list of common environment variable settings. These environment variables are set for all tasks in jobs created under this schedule (including the Job Manager, Job Preparation and Job Release tasks).",
+          "description": "Individual tasks can override an environment setting specified here by specifying the same setting name with a different value."
         },
         "poolInfo": {
           "$ref": "#/definitions/PoolInformation",
@@ -10854,7 +10879,8 @@
           "items": {
             "$ref": "#/definitions/MetadataItem"
           },
-          "title": "A list of name-value pairs associated with each job created under this schedule as metadata."
+          "title": "A list of name-value pairs associated with each job created under this schedule as metadata.",
+          "description": "The Batch service does not assign any meaning to metadata; it is solely for the use of user code."
         }
       },
       "required": ["poolInfo"],
