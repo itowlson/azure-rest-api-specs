@@ -9924,22 +9924,24 @@
         "readIOGiB": {
           "type": "number",
           "format": "double",
-          "title": "The total gibibytes read from disk by all tasks in the job."
+          "title": "The total amount of data in GiB read from disk by all tasks in the job."
         },
         "writeIOGiB": {
           "type": "number",
           "format": "double",
-          "title": "The total gibibytes written to disk by all tasks in the job."
+          "title": "The total amount of data in GiB written to disk by all tasks in the job."
         },
         "numSucceededTasks": {
           "type": "integer",
           "format": "int64",
-          "title": "The total number of tasks successfully completed in the job during the given time range."
+          "title": "The total number of tasks successfully completed in the job during the given time range.",
+          "description": "A task completes successfully if it returns exit code 0."
         },
         "numFailedTasks": {
           "type": "integer",
           "format": "int64",
-          "title": "The total number of tasks in the job that failed during the given time range."
+          "title": "The total number of tasks in the job that failed during the given time range.",
+          "description": "A task fails if it exhausts its maximum retry count without returning exit code 0."
         },
         "numTaskRetries": {
           "type": "integer",
@@ -9950,7 +9952,7 @@
           "type": "string",
           "format": "duration",
           "title": "The total wait time of all tasks in the job.",
-          "description": "The wait time for a task is defined as the elapsed time between the creation of the task and the start of task execution. (If the task is retried due to failures, the wait time is the time to the most recent task execution.)"
+          "description": "The wait time for a task is defined as the elapsed time between the creation of the task and the start of task execution. (If the task is retried due to failures, the wait time is the time to the most recent task execution.) This value is only reported in the account lifetime statistics; it is not included in the job statistics."
         }
       },
       "required": ["url","startTime","lastUpdateTime","userCPUTime","kernelCPUTime","wallClockTime","readIOps","writeIOps","readIOGiB","writeIOGiB","numSucceededTasks","numFailedTasks","numTaskRetries","waitTime"],
@@ -9984,7 +9986,8 @@
           "items": {
             "$ref": "#/definitions/NameValuePair"
           },
-          "title": "A list of additional error details related to the certificate deletion error."
+          "title": "A list of additional error details related to the certificate deletion error.",
+          "description": "This list includes details such as the active pools and nodes referencing this certificate. However, if a large number of resources reference the certificate, the list contains only about the first hundred."
         }
       },
       "title": "An error encountered by the Batch service when deleting a certificate."
@@ -9993,11 +9996,11 @@
       "properties": {
         "thumbprint": {
           "type": "string",
-          "title": "The X.509 thumbprint of the certificate. This is a sequence of up to 40 hex digits (it may include spaces but these are removed)."
+          "title": "The X.509 thumbprint of the certificate. This is a sequence of up to 40 hex digits."
         },
         "thumbprintAlgorithm": {
           "type": "string",
-          "title": "The algorithm used to derive the thumbprint. This must be sha1."
+          "title": "The algorithm used to derive the thumbprint."
         },
         "url": {
           "type": "string",
@@ -10042,7 +10045,7 @@
         "deleteCertificateError": {
           "$ref": "#/definitions/DeleteCertificateError",
           "title": "The error that occurred on the last attempt to delete this certificate.",
-          "description": " This property is set only if the certificate is in the DeleteFailed state."
+          "description": "This property is set only if the certificate is in the DeleteFailed state."
         }
       },
       "description": "A certificate that can be installed on compute nodes and can be used to authenticate operations on the machine."
@@ -10055,7 +10058,8 @@
         },
         "version": {
           "type": "string",
-          "title": "The version of the application to deploy. If omitted, the default version is deployed."
+          "title": "The version of the application to deploy. If omitted, the default version is deployed.",
+          "description": "If this is omitted, and no default version is specified for this application, the request fails with the error code InvalidApplicationPackageReferences. If you are calling the REST API directly, the HTTP status code is 409."
         }
       },
       "required": ["applicationId"],
@@ -10108,7 +10112,8 @@
         },
         "password": {
           "type": "string",
-          "title": "The password to access the certificate's private key."
+          "title": "The password to access the certificate's private key.",
+          "description": "This is required if the certificate format is pfx. It should be omitted if the certificate format is cer."
         }
       },
       "required": ["thumbprint", "thumbprintAlgorithm", "data"],
@@ -10128,14 +10133,15 @@
           "title": "The URL to get the next set of results."
         }
       },
-      "title": "Response to a CertificateOperation.List request."
+      "title": "The result of listing the certificates in the account."
     },
     "FileProperties": {
       "properties": {
         "creationTime": {
           "type": "string",
           "format": "date-time",
-          "title": "The file creation time."
+          "title": "The file creation time.",
+          "description": "The creation time is not returned for files on Linux compute nodes."
         },
         "lastModified": {
           "type": "string",
@@ -10154,7 +10160,7 @@
         "fileMode": {
           "type": "string",
           "title": "The file mode attribute in octal format.",
-          "description": "This property will be returned only from a Linux compute node."
+          "description": "The file mode is returned only for files on Linux compute nodes."
         }
       },
       "required": ["lastModified","contentLength"],
@@ -10195,7 +10201,7 @@
           "title": "The URL to get the next set of results."
         }
       },
-      "title": "Response to a FileOperation.ListFromComputeNode or FileOperation.ListFromTask request."
+      "title": "The result of listing the files on a compute node, or the files associated with a task on a node."
     },
     "Schedule": {
       "properties": {
@@ -10208,18 +10214,20 @@
         "doNotRunAfter": {
           "type": "string",
           "format": "date-time",
-          "title": "A time after which no job will be created under this job schedule. The schedule will move to the completed state as soon as this deadline is past and there is no active job under this job schedule."
+          "title": "A time after which no job will be created under this job schedule. The schedule will move to the completed state as soon as this deadline is past and there is no active job under this job schedule.",
+          "description": "If you do not specify a doNotRunAfter time, and you are creating a recurring job schedule, the job schedule will remain active until you explicitly terminate it."
         },
         "startWindow": {
           "type": "string",
           "format": "duration",
           "title": "The time interval, starting from the time at which the schedule indicates a job should be created, within which a job must be created.",
-          "description": "If a job is not created within the startWindow interval, then the 'opportunity' is lost; no job will be created until the next recurrence of the schedule."
+          "description": "If a job is not created within the startWindow interval, then the 'opportunity' is lost; no job will be created until the next recurrence of the schedule. If the schedule is recurring, and the startWindow is longer than the recurrence interval, then this is equivalent to an infinite startWindow, because the job that is 'due' in one recurrence interval is not carried forward into the next recurrence interval. The default is infinite. The minimum value is 1 minute. If you specify a lower value, the Batch service rejects the schedule with an error; if you are calling the REST API directly, the HTTP status code is 400 (Bad Request)."
         },
         "recurrenceInterval": {
           "type": "string",
           "format": "duration",
-          "title": "The time interval between the start times of two successive jobs under the job schedule. A job schedule can have at most one active job under it at any given time."
+          "title": "The time interval between the start times of two successive jobs under the job schedule. A job schedule can have at most one active job under it at any given time.",
+          "description": "Because a job schedule can have at most one active job under it at any given time, if it is time to create a new job under a job schedule, but the previous job is still running, the Batch service will not create the new job until the previous job finishes. If the previous job does not finish within the startWindow period of the new recurrence interval, then no new job will be scheduled for that interval. For recurring jobs, you should normally specify a jobManagerTask in the jobSpecification. If you do not use jobManagerTask, you will need an external process to monitor when jobs are created, add tasks to the jobs and terminate the jobs ready for the next recurrence. The default is that the schedule does not recur: one job is created, within the startWindow after the doNotRunUntil time, and the schedule is complete as soon as that job finishes. The minimum value is 1 minute. If you specify a lower value, the Batch service rejects the schedule with an error; if you are calling the REST API directly, the HTTP status code is 400 (Bad Request)."
         }
       },
       "title": "The schedule according to which jobs will be created"
@@ -10229,12 +10237,14 @@
         "maxWallClockTime": {
           "type": "string",
           "format": "duration",
-          "title": "The maximum elapsed time that the job may run, measured from the time the job starts. If the job does not complete within the time limit, the Batch service terminates it and any tasks that are still running."
+          "title": "The maximum elapsed time that the job may run, measured from the time the job starts. If the job does not complete within the time limit, the Batch service terminates it and any tasks that are still running. In this case, the termination reason will be MaxWallClockTimeExpiry.",
+          "description": "If this is not specified, there is no time limit on how long the job may run."
         },
         "maxTaskRetryCount": {
           "type": "integer",
           "format": "int32",
-          "title": "The maximum number of times each task may be retried. The Batch service retries a task if its exit code is nonzero."
+          "title": "The maximum number of times each task may be retried. The Batch service retries a task if its exit code is nonzero.",
+          "description": "Note that this value specifically controls the number of retries. The Batch service will try each task once, and may then retry up to this limit. For example, if the maximum retry count is 3, Batch tries a task up to 4 times (one initial try and 3 retries). If the maximum retry count is 0, the Batch service does not retry tasks. If the maximum retry count is -1, the Batch service retries tasks without limit.The default value is 0 (no retries)."
         }
       },
       "title": "Specifies the execution constraints for jobs created on a schedule."
