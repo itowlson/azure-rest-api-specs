@@ -10453,7 +10453,7 @@
         "id": {
           "type": "string",
           "title": "A string that uniquely identifies the job preparation task within the job.",
-          "description": "The id can contain any combination of alphanumeric characters including hyphens and underscores and cannot contain more than 64 characters."
+          "description": "The id can contain any combination of alphanumeric characters including hyphens and underscores and cannot contain more than 64 characters. If you do not specify this property, the Batch service assigns a default value of 'jobpreparation'. No other task in the job can have the same id as the Job Preparation task. If you try to submit a task with the same id, the Batch service rejects the request with error code TaskIdSameAsJobPreparationTask; if you are calling the REST API directly, the HTTP status code is 409 (Conflict)."
         },
         "commandLine": {
           "type": "string",
@@ -10465,7 +10465,8 @@
           "items": {
             "$ref": "#/definitions/ResourceFile"
           },
-          "title": "A list of files that the Batch service will download to the compute node before running the command line."
+          "title": "A list of files that the Batch service will download to the compute node before running the command line.",
+          "description": "Files listed under this element are located in the task's wd directory."
         },
         "environmentSettings": {
           "type": "array",
@@ -10480,7 +10481,8 @@
         },
         "waitForSuccess": {
           "type": "boolean",
-          "title": "Whether the Batch service should wait for the Job Preparation task to complete successfully before scheduling any other tasks of the job on the compute node."
+          "title": "Whether the Batch service should wait for the Job Preparation task to complete successfully before scheduling any other tasks of the job on the compute node.",
+          "description": "If true and the Job Preparation task fails on a compute node, the Batch service retries the Job Preparation task up to its maximum retry count (as specified in the constraints element). If the task has still not completed successfully after all retries, then the Batch service will not schedule tasks of the job to the compute node. The compute node remains active and eligible to run tasks of other jobs. If false, the Batch service will not wait for the Job Preparation task to complete. In this case, other tasks of the job can start executing on the compute node while the Job Preparation task is still running; and even if the Job Preparation task fails, new tasks will continue to be scheduled on the node. The default value is true."
         },
         "runElevated": {
           "type": "boolean",
@@ -10489,7 +10491,7 @@
         "rerunOnNodeRebootAfterSuccess": {
           "type": "boolean",
           "title": "Whether the Batch service should rerun the Job Preparation task after a compute node reboots.",
-          "description": "Note that the Job Preparation task should still be written to be idempotent because it can be rerun if the compute node is rebooted while Job Preparation task is still running. The default value is true."
+          "description": "The Job Preparation task is always rerun if a compute node is reimaged, or if the Job Preparation task did not complete (e.g. because the reboot occurred while the task was running). Therefore, you should always write a Job Preparation task to be idempotent and to behave correctly if run multiple times. The default value is true."
         }
       },
       "required": ["commandLine"],
@@ -10500,7 +10502,7 @@
         "id": {
           "type": "string",
           "title": "A string that uniquely identifies the Job Release task within the job.",
-          "description": "The id can contain any combination of alphanumeric characters including hyphens and underscores and cannot contain more than 64 characters."
+          "description": "The id can contain any combination of alphanumeric characters including hyphens and underscores and cannot contain more than 64 characters. If you do not specify this property, the Batch service assigns a default value of 'jobrelease'. No other task in the job can have the same id as the Job Release task. If you try to submit a task with the same id, the Batch service rejects the request with error code TaskIdSameAsJobReleaseTask; if you are calling the REST API directly, the HTTP status code is 409 (Conflict)."
         },
         "commandLine": {
           "type": "string",
@@ -10512,7 +10514,8 @@
           "items": {
             "$ref": "#/definitions/ResourceFile"
           },
-          "title": "A list of files that the Batch service will download to the compute node before running the command line."
+          "title": "A list of files that the Batch service will download to the compute node before running the command line.",
+          "description": "Files listed under this element are located in the task's wd directory."
         },
         "environmentSettings": {
           "type": "array",
@@ -10524,13 +10527,13 @@
         "maxWallClockTime": {
           "type": "string",
           "format": "duration",
-          "title": "The maximum elapsed time that the Job Release task may run on a given compute node, measured from the time the task starts. If the task does not complete within the time limit, the Batch service terminates it. The default value is 15 minutes."
+          "title": "The maximum elapsed time that the Job Release task may run on a given compute node, measured from the time the task starts. If the task does not complete within the time limit, the Batch service terminates it. The default value is 15 minutes. You may not specify a timeout longer than 15 minutes. If you do, the Batch service rejects it with an error; if you are calling the REST API directly, the HTTP status code is 400 (Bad Request)."
         },
         "retentionTime": {
           "type": "string",
           "format": "duration",
           "title": "The minimum time to retain the working directory for the Job Release task on the compute node. After this time, the Batch service may delete the working directory and all its contents.",
-          "description": " The default is infinite."
+          "description": "The default is infinite, i.e. the working directory will be retained until the compute node is removed or reimaged."
         },
         "runElevated": {
           "type": "boolean",
@@ -10585,11 +10588,13 @@
         "maxTaskRetryCount": {
           "type": "integer",
           "format": "int32",
-          "title": "The maximum number of times the task may be retried."
+          "title": "The maximum number of times the task may be retried.",
+          "description": "The Batch service retries a task if its exit code is nonzero. Note that this value specifically controls the number of retries. The Batch service will try the task once, and may then retry up to this limit. For example, if the maximum retry count is 3, Batch tries the task up to 4 times (one initial try and 3 retries). If the maximum retry count is 0, the Batch service does not retry the task. If the maximum retry count is -1, the Batch service retries the task without limit."
         },
         "waitForSuccess": {
           "type": "boolean",
-          "title": "Whether the Batch service should wait for the start task to complete successfully (that is, to exit with exit code 0) before scheduling any tasks on the compute node."
+          "title": "Whether the Batch service should wait for the start task to complete successfully (that is, to exit with exit code 0) before scheduling any tasks on the compute node.",
+          "description": "If true and the start task fails on a compute node, the Batch service retries the start task up to its maximum retry count (maxTaskRetryCount). If the task has still not completed successfully after all retries, then the Batch service marks the compute node unusable, and will not schedule tasks to it. This condition can be detected via the node state and scheduling error detail. If false, the Batch service will not wait for the start task to complete. In this case, other tasks can start executing on the compute node while the start task is still running; and even if the start task fails, new tasks will continue to be scheduled on the node. The default is false."
         }
       },
       "required": ["commandLine"],
