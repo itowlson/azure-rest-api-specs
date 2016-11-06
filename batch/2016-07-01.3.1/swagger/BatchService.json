@@ -10904,11 +10904,13 @@
         "nextRunTime": {
           "type": "string",
           "format": "date-time",
-          "title": "The next time at which a job will be created under this schedule."
+          "title": "The next time at which a job will be created under this schedule.",
+          "description": "This property is meaningful only if the schedule is in the active state when the time comes around. For example, if the schedule is disabled, no job will be created at nextRunTime unless the job is enabled before then."
         },
         "recentJob": {
           "$ref": "#/definitions/RecentJob",
-          "title": "Information about the most recent job under the job schedule."
+          "title": "Information about the most recent job under the job schedule.",
+          "description": "This property is present only if the at least one job has run under the schedule."
         },
         "endTime": {
           "type": "string",
@@ -10917,7 +10919,7 @@
           "description": "This property is set only if the job schedule is in the completed state."
         }
       },
-      "title": "Specifies how tasks should be run in a job associated with a job schedule."
+      "title": "Contains information about jobs that have been and will be run under a job schedule."
     },
     "JobScheduleStatistics": {
       "properties": {
@@ -10948,7 +10950,8 @@
         "wallClockTime": {
           "type": "string",
           "format": "duration",
-          "title": "The total wall clock time of all the tasks in all the jobs created under the schedule."
+          "title": "The total wall clock time of all the tasks in all the jobs created under the schedule.",
+          "description": "The wall clock time is the elapsed time from when the task started running on a compute node to when it finished (or to the last time the statistics were updated, if the task had not finished by then). If a task was retried, this includes the wall clock time of all the task retries."
         },
         "readIOps": {
           "type": "integer",
@@ -10988,7 +10991,8 @@
         "waitTime": {
           "type": "string",
           "format": "duration",
-          "title": "The total wait time of all tasks in all jobs created under the schedule. The wait time for a task is defined as the elapsed time between the creation of the task and the start of task execution. (If the task is retried due to failures, the wait time is the time to the most recent task execution.)"
+          "title": "The total wait time of all tasks in all jobs created under the schedule. The wait time for a task is defined as the elapsed time between the creation of the task and the start of task execution. (If the task is retried due to failures, the wait time is the time to the most recent task execution.)",
+          "description": "This value is only reported in the account lifetime statistics; it is not included in the job statistics."
         }
       },
       "required": ["url","startTime","lastUpdateTime","userCPUTime","kernelCPUTime","wallClockTime","readIOps","writeIOps","readIOGiB","writeIOGiB","numSucceededTasks","numFailedTasks","numTaskRetries", "waitTime"],
@@ -11011,12 +11015,14 @@
         },
         "eTag": {
           "type": "string",
-          "title": "The ETag of the job schedule."
+          "title": "The ETag of the job schedule.",
+          "description": "This is an opaque string. You can use it to detect whether the job schedule has changed between requests. In particular, you can be pass the ETag with an Update Job Schedule request to specify that your changes should take effect only if nobody else has modified the schedule in the meantime."
         },
         "lastModified": {
           "type": "string",
           "format": "date-time",
-          "title": "The last modified time of the job schedule."
+          "title": "The last modified time of the job schedule.",
+          "description": "This is the last time at which the schedule level data, such as the job specification or recurrence information, changed. It does not factor in job-level changes such as new jobs being created or jobs changing state."
         },
         "creationTime": {
           "type": "string",
@@ -11043,6 +11049,7 @@
         "previousState": {
           "type": "string",
           "title": "The previous state of the job schedule.",
+          "description": "This property is not present if the job schedule is in its initial active state.",
           "enum": [
             "active",
             "completed",
@@ -11055,7 +11062,8 @@
         "previousStateTransitionTime": {
           "type": "string",
           "format": "date-time",
-          "title": "The time at which the job schedule entered its previous state."
+          "title": "The time at which the job schedule entered its previous state.",
+          "description": "This property is not present if the job schedule is in its initial active state."
         },
         "schedule": {
           "$ref": "#/definitions/Schedule",
@@ -11074,7 +11082,8 @@
           "items": {
             "$ref": "#/definitions/MetadataItem"
           },
-          "title": "A list of name-value pairs associated with the schedule as metadata."
+          "title": "A list of name-value pairs associated with the schedule as metadata.",
+          "description": "The Batch service does not assign any meaning to metadata; it is solely for the use of user code."
         },
         "stats": {
           "$ref": "#/definitions/JobScheduleStatistics",
@@ -11087,11 +11096,13 @@
       "properties": {
         "id": {
           "type": "string",
-          "title": "A string that uniquely identifies the schedule within the account."
+          "title": "A string that uniquely identifies the schedule within the account.",
+          "description": "The id can contain any combination of alphanumeric characters including hyphens and underscores, and cannot contain more than 64 characters. The id is case-preserving and case-insensitive (that is, you may not have two ids within an account that differ only by case)."
         },
         "displayName": {
           "type": "string",
-          "title": "The display name for the schedule."
+          "title": "The display name for the schedule.",
+          "description": "The display name need not be unique and can contain any Unicode characters up to a maximum length of 1024."
         },
         "schedule": {
           "$ref": "#/definitions/Schedule",
@@ -11106,7 +11117,8 @@
           "items": {
             "$ref": "#/definitions/MetadataItem"
           },
-          "title": "A list of name-value pairs associated with the schedule as metadata."
+          "title": "A list of name-value pairs associated with the schedule as metadata.",
+          "description": "The Batch service does not assign any meaning to metadata; it is solely for the use of user code."
         }
       },
       "required": ["id", "schedule", "jobSpecification"],
@@ -11126,7 +11138,7 @@
           "title": "The URL to get the next set of results."
         }
       },
-      "title": "Response to a CloudJobScheduleOperation.List request."
+      "title": "The result of listing the job schedules in an account."
     },
     "JobSchedulingError": {
       "properties": {
