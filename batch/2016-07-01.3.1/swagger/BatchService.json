@@ -11500,7 +11500,8 @@
         },
         "state": {
           "type": "string",
-          "title": "The current state of the Job Preparation task.",
+          "title": "The current state of the Job Preparation task on the compute node.",
+          "description": "Possible values are: running – the task is currently running (including retrying). completed – the task has exited with exit code 0, or the task has exhausted its retry limit, or the Batch service was unable to start the task due to scheduling errors",
           "enum": [
             "running",
             "completed"
@@ -11534,7 +11535,7 @@
           "type": "string",
           "format": "date-time",
           "title": "The most recent time at which a retry of the Job Preparation task started running.",
-          "description": "This property is set only if the task was retried (i.e. retryCount is nonzero)."
+          "description": "This property is set only if the task was retried (i.e. retryCount is nonzero). If present, this is typically the same as startTime, but may be different if the task has been restarted for reasons other than retry; for example, if the compute node was rebooted during a retry, then the startTime is updated but the lastRetryTime is not."
         }
       },
       "required": ["startTime","retryCount","state"],
@@ -11555,7 +11556,8 @@
         },
         "state": {
           "type": "string",
-          "title": "The current state of the Job Release task.",
+          "title": "The current state of the Job Release task on the compute node.",
+          "description": "Possible values are: running – the task is currently running (including retrying). completed – the task has exited, or the Batch service was unable to start the task due to scheduling errors.",
           "enum": [
             "running",
             "completed"
@@ -11578,7 +11580,7 @@
         },
         "schedulingError": {
           "$ref": "#/definitions/TaskSchedulingError",
-          "title": "The scheduling error encountered by the Batch service when starting the task."
+          "title": "The error encountered by the Batch service when starting the task."
         }
       },
       "required": ["startTime","state"],
@@ -11588,11 +11590,11 @@
       "properties": {
         "poolId": {
           "type": "string",
-          "title": "The id of the pool containing the compute node to which this entry refers."
+          "title": "The ID of the pool containing the compute node to which this entry refers."
         },
         "nodeId": {
           "type": "string",
-          "title": "The id of the compute node to which this entry refers."
+          "title": "The ID of the compute node to which this entry refers."
         },
         "nodeUrl": {
           "type": "string",
@@ -11624,7 +11626,7 @@
           "title": "The URL to get the next set of results."
         }
       },
-      "title": "Response to a CloudJobOperations.ListPreparationAndReleaseTaskStatus request."
+      "title": "The result of listing the status of the job preparation and job release tasks for a job."
     },
     "AutoScaleRunError": {
       "properties": {
