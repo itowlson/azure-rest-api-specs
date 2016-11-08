@@ -13278,7 +13278,7 @@
           "x-ms-enum": { "name": "ComputeNodeRebootOption", "modelAsString": false }
         }
       },
-      "title": "Parameters for a ComputeNodeOperations.Reboot request."
+      "title": "Options for rebooting a compute node."
     },
     "NodeReimageParameter": {
       "properties": {
@@ -13295,13 +13295,13 @@
           "x-ms-enum": { "name": "ComputeNodeReimageOption", "modelAsString": false }
         }
       },
-      "title": "Parameters for a ComputeNodeOperations.Reimage request."
+      "title": "Options for reimaging a compute node."
     },
     "NodeDisableSchedulingParameter": {
       "properties": {
         "nodeDisableSchedulingOption": {
           "type": "string",
-          "title": "What to do with currently running tasks when disable task scheduling on the compute node.",
+          "title": "What to do with currently running tasks when disabling task scheduling on the compute node.",
           "description": "The default value is requeue.",
           "enum": [
             "requeue",
@@ -13311,7 +13311,7 @@
           "x-ms-enum": { "name": "DisableComputeNodeSchedulingOption", "modelAsString": false }
         }
       },
-      "title": "Parameters for a ComputeNodeOperations.DisableScheduling request."
+      "title": "Options for disabling scheduling on a compute node."
     },
     "NodeRemoveParameter": {
       "properties": {
@@ -13327,11 +13327,12 @@
           "type": "string",
           "format": "duration",
           "title": "The timeout for removal of compute nodes to the pool.",
-          "description": "The default value is 10 minutes."
+          "description": "The default value is 15 minutes. The minimum value is 5 minutes. If you specify a value less than 5 minutes, the Batch service returns an error; if you are calling the REST API directly, the HTTP status code is 400 (Bad Request)."
         },
         "nodeDeallocationOption": {
           "type": "string",
-          "title": "When compute nodes may be removed from the pool.",
+          "title": "When to remove compute nodes and what to do with currently running tasks.",
+          "description": "The default value is requeue.",
           "enum": [
             "requeue",
             "terminate",
@@ -13342,7 +13343,7 @@
         }
       },
       "required": ["nodeList"],
-      "title": "Parameters for a ComputeNodeOperations.Remove request."
+      "title": "Options for removing compute nodes from a pool."
     },
     "ErrorMessage": {
       "properties": {
