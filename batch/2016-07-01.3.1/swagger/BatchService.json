@@ -11769,7 +11769,7 @@
       "properties": {
         "subnetId": {
           "type": "string",
-          "description": "The ARM resource identifier of the virtual network subnet which the compute nodes of the pool will join. The virtual network must be in the same region and subscription as the Azure Batch account. This property can only be specified for pools created with a cloudServiceConfiguration."
+          "description": "The ARM resource identifier of the virtual network subnet which the compute nodes of the pool will join. This is of the form /subscriptions/{subscription}/resourceGroups/{group}/providers/{provider}/virtualNetworks/{network}/subnets/{subnet}. The virtual network must be in the same region and subscription as the Azure Batch account. This property can only be specified for pools created with a cloudServiceConfiguration."
         }
       },
       "description": "The network configuration for a pool."
@@ -12303,11 +12303,12 @@
         "id": {
           "type": "string",
           "title": "A string that uniquely identifies the task within the job.",
-          "description": "The id can contain any combination of alphanumeric characters including hyphens and underscores, and cannot contain more than 64 characters. It is common to use a GUID for the id."
+          "description": "The ID can contain any combination of alphanumeric characters including hyphens and underscores, and cannot contain more than 64 characters."
         },
         "displayName": {
           "type": "string",
-          "title": "A display name for the task."
+          "title": "A display name for the task.",
+          "description": "The display name need not be unique and can contain any Unicode characters up to a maximum length of 1024."
         },
         "url": {
           "type": "string",
@@ -12315,7 +12316,8 @@
         },
         "eTag": {
           "type": "string",
-          "title": "The ETag of the task."
+          "title": "The ETag of the task.",
+          "description": "This is an opaque string. You can use it to detect whether the task has changed between requests. In particular, you can be pass the ETag when updating a task to specify that your changes should take effect only if nobody else has modified the task in the meantime."
         },
         "lastModified": {
           "type": "string",
@@ -12368,7 +12370,7 @@
         "commandLine": {
           "type": "string",
           "title": "The command line of the task.",
-          "description": "For multi-instance tasks, the command line is executed on the primary subtask after all the subtasks have finished executing the coordianation command line. The command line does not run under a shell, and therefore cannot take advantage of shell features such as environment variable expansion. If you want to take advantage of such features, you should invoke the shell in the command line, for example using \"cmd /c MyCommand\" in Windows or \"/bin/sh -c MyCommand\" in Linux."
+          "description": "For multi-instance tasks, the command line is executed as the primary task, after the primary task and all subtasks have finished executing the coordination command line. The command line does not run under a shell, and therefore cannot take advantage of shell features such as environment variable expansion. If you want to take advantage of such features, you should invoke the shell in the command line, for example using \"cmd /c MyCommand\" in Windows or \"/bin/sh -c MyCommand\" in Linux."
         },
         "resourceFiles": {
           "type": "array",
@@ -12376,7 +12378,7 @@
             "$ref": "#/definitions/ResourceFile"
           },
           "title": "A list of files that the Batch service will download to the compute node before running the command line.",
-          "description": "For multi-instance tasks, the resource files will only be downloaded to the compute node on which the primary subtask is executed."
+          "description": "For multi-instance tasks, the resource files will only be downloaded to the compute node on which the primary task is executed."
         },
         "environmentSettings": {
           "type": "array",
@@ -12407,7 +12409,7 @@
         },
         "multiInstanceSettings": {
           "$ref": "#/definitions/MultiInstanceSettings",
-          "title": "Information about how to run the multi-instance task."
+          "title": "An object that indicates that the task is a multi-instance task, and contains information about how to run the multi-instance task."
         },
         "stats": {
           "$ref": "#/definitions/TaskStatistics",
@@ -12415,7 +12417,8 @@
         },
         "dependsOn": {
           "$ref": "#/definitions/TaskDependencies",
-          "title": "Any dependencies this task has."
+          "title": "The tasks that this task depends on.",
+          "description": "The task will not be scheduled until all depended-on tasks have completed successfully. (If any depended-on tasks fail and exhaust their retry counts, the task will never be scheduled.)"
         },
         "applicationPackageReferences": {
           "type": "array",
@@ -12432,16 +12435,17 @@
         "id": {
           "type": "string",
           "title": "A string that uniquely identifies the task within the job.",
-          "description": "The id can contain any combination of alphanumeric characters including hyphens and underscores, and cannot contain more than 64 characters. It is common to use a GUID for the id."
+          "description": "The ID can contain any combination of alphanumeric characters including hyphens and underscores, and cannot contain more than 64 characters. The ID is case-preserving and case-insensitive (that is, you may not have two IDs within a job that differ only by case)."
         },
         "displayName": {
           "type": "string",
-          "title": "A display name for the task."
+          "title": "A display name for the task.",
+          "description": "The display name need not be unique and can contain any Unicode characters up to a maximum length of 1024."
         },
         "commandLine": {
           "type": "string",
-          "title": "The command line of the task. For multi-instance tasks, the command line is executed on the primary subtask after all the subtasks have finished executing the coordianation command line.",
-          "description": "The command line does not run under a shell, and therefore cannot take advantage of shell features such as environment variable expansion. If you want to take advantage of such features, you should invoke the shell in the command line, for example using \"cmd /c MyCommand\" in Windows or \"/bin/sh -c MyCommand\" in Linux."
+          "title": "The command line of the task.",
+          "description": "For multi-instance tasks, the command line is executed as the primary task, after the primary task and all subtasks have finished executing the coordination command line. The command line does not run under a shell, and therefore cannot take advantage of shell features such as environment variable expansion. If you want to take advantage of such features, you should invoke the shell in the command line, for example using \"cmd /c MyCommand\" in Windows or \"/bin/sh -c MyCommand\" in Linux."
         },
         "exitConditions": {
           "$ref": "#/definitions/ExitConditions",
@@ -12453,7 +12457,7 @@
             "$ref": "#/definitions/ResourceFile"
           },
           "title": "A list of files that the Batch service will download to the compute node before running the command line.",
-          "description": "For multi-instance tasks, the resource files will only be downloaded to the compute node on which the primary subtask is executed."
+          "description": "For multi-instance tasks, the resource files will only be downloaded to the compute node on which the primary task is executed."
         },
         "environmentSettings": {
           "type": "array",
@@ -12468,19 +12472,22 @@
         },
         "constraints": {
           "$ref": "#/definitions/TaskConstraints",
-          "title": "The execution constraints that apply to this task."
+          "title": "The execution constraints that apply to this task.",
+          "description": "If you do not specify constraints, the maxTaskRetryCount is the maxTaskRetryCount specified for the job, and the maxWallClockTime and retentionTime are infinite."
         },
         "runElevated": {
           "type": "boolean",
-          "title": "Whether to run the task in elevated mode."
+          "title": "Whether to run the task in elevated mode.",
+          "description": "The default value is false."
         },
         "multiInstanceSettings": {
           "$ref": "#/definitions/MultiInstanceSettings",
-          "title": "Information about how to run the multi-instance task."
+          "title": "An object that indicates that the task is a multi-instance task, and contains information about how to run the multi-instance task."
         },
         "dependsOn": {
           "$ref": "#/definitions/TaskDependencies",
-          "title": "Any other tasks that this task depends on."
+          "title": "The tasks that this task depends on.",
+          "description": "The task will not be scheduled until all depended-on tasks have completed successfully. (If any depended-on tasks fail and exhaust their retry counts, the task will never be scheduled.) If the job does not have usesTaskDependencies set to true, and this element is present, the request fails with error code TaskDependenciesNotSpecifiedOnJob."
         },
         "applicationPackageReferences": {
           "type": "array",
@@ -12522,7 +12529,7 @@
         },
         "taskId": {
           "type": "string",
-          "title": "The id of the task for which this is the result."
+          "title": "The ID of the task for which this is the result."
         },
         "eTag": {
           "type": "string",
@@ -12555,14 +12562,14 @@
           "title": "The results of the add task collection operation."
         }
       },
-      "title": "Response to a TaskOperations.AddCollection request."
+      "title": "The result of adding a collection of tasks to a job."
     },
     "SubtaskInformation": {
       "properties": {
         "id": {
           "type": "integer",
           "format": "int32",
-          "title": "The id of the subtask."
+          "title": "The ID of the subtask."
         },
         "nodeInfo": {
           "$ref": "#/definitions/ComputeNodeInformation",
@@ -12583,7 +12590,7 @@
           "type": "integer",
           "format": "int32",
           "title": "The exit code of the program specified on the subtask command line.",
-          "description": "This parameter is returned only if the subtask is in the completed state. The exit code for a process reflects the specific convention implemented by the application developer for that process. If you use the exit code value to make decisions in your code, be sure that you know the exit code convention used by the application process. Note that the exit code may also be generated by the compute node operating system, such as when a process is forcibly terminated."
+          "description": "This property is set only if the sutask is in the completed state. In general, the exit code for a process reflects the specific convention implemented by the application developer for that process. If you use the exit code value to make decisions in your code, be sure that you know the exit code convention used by the application process. However, if the Batch service terminates the subtask (due to timeout, or user termination via the API) you may see an operating system-defined exit code."
         },
         "schedulingError": {
           "$ref": "#/definitions/TaskSchedulingError",
@@ -12608,7 +12615,7 @@
         "previousState": {
           "type": "string",
           "title": "The previous state of the subtask.",
-          "description": "This property is not set if the subtask is in its initial Active state.",
+          "description": "This property is not set if the subtask is in its initial running state.",
           "enum": [
             "active",
             "preparing",
@@ -12621,7 +12628,7 @@
           "type": "string",
           "format": "date-time",
           "title": "The time at which the subtask entered its previous state.",
-          "description": "This property is not set if the subtask is in its initial Active state."
+          "description": "This property is not set if the subtask is in its initial running state."
         }
       },
       "title": "Information about an Azure Batch subtask."
@@ -12633,10 +12640,10 @@
           "items": {
             "$ref": "#/definitions/SubtaskInformation"
           },
-          "title": "The list of information of subtasks."
+          "title": "The list of subtasks."
         }
       },
-      "title": "Response to a CloudTaskOperations.ListSubtasks request."
+      "title": "The result of listing the subtasks of a task."
     },
     "CloudTaskListResult": {
       "properties": {
@@ -12652,7 +12659,7 @@
           "title": "The URL to get the next set of results."
         }
       },
-      "title": "Response to a CloudTaskOperations.List request."
+      "title": "The result of listing the tasks in a job."
     },
     "TaskInformation": {
       "properties": {
