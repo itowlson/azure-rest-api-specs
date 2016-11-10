@@ -9664,7 +9664,7 @@
       "properties": {
         "poolId": {
           "type": "string",
-          "title": "The id of the pool whose metrics are aggregated in this entry."
+          "title": "The ID of the pool whose metrics are aggregated in this entry."
         },
         "startTime": {
           "type": "string",
@@ -9674,7 +9674,7 @@
         "endTime": {
           "type": "string",
           "format": "date-time",
-          "title": "The end time of the aggregation interval for this entry."
+          "title": "The end time of the aggregation interval covered by this entry."
         },
         "vmSize": {
           "type": "string",
@@ -9720,7 +9720,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "title": "The id of the node agent SKU."
+          "title": "The ID of the node agent SKU."
         },
         "verifiedImageReferences": {
           "type": "array",
@@ -9732,7 +9732,7 @@
         },
         "osType": {
           "type": "string",
-          "title": "The type of operating system (Windows/Linux) compatible with the node agent SKU.",
+          "title": "The type of operating system (e.g. Windows or Linux) compatible with the node agent SKU.",
           "enum": [
             "linux",
             "windows",
@@ -10221,13 +10221,13 @@
           "type": "string",
           "format": "duration",
           "title": "The time interval, starting from the time at which the schedule indicates a job should be created, within which a job must be created.",
-          "description": "If a job is not created within the startWindow interval, then the 'opportunity' is lost; no job will be created until the next recurrence of the schedule. If the schedule is recurring, and the startWindow is longer than the recurrence interval, then this is equivalent to an infinite startWindow, because the job that is 'due' in one recurrence interval is not carried forward into the next recurrence interval. The default is infinite. The minimum value is 1 minute. If you specify a lower value, the Batch service rejects the schedule with an error; if you are calling the REST API directly, the HTTP status code is 400 (Bad Request)."
+          "description": "If a job is not created within the startWindow interval, then the 'opportunity' is lost; no job will be created until the next recurrence of the schedule. If the schedule is recurring, and the startWindow is longer than the recurrence interval, then this is equivalent to an infinite startWindow, because the job that is 'due' in one recurrenceInterval is not carried forward into the next recurrence interval. The default is infinite. The minimum value is 1 minute. If you specify a lower value, the Batch service rejects the schedule with an error; if you are calling the REST API directly, the HTTP status code is 400 (Bad Request)."
         },
         "recurrenceInterval": {
           "type": "string",
           "format": "duration",
           "title": "The time interval between the start times of two successive jobs under the job schedule. A job schedule can have at most one active job under it at any given time.",
-          "description": "Because a job schedule can have at most one active job under it at any given time, if it is time to create a new job under a job schedule, but the previous job is still running, the Batch service will not create the new job until the previous job finishes. If the previous job does not finish within the startWindow period of the new recurrence interval, then no new job will be scheduled for that interval. For recurring jobs, you should normally specify a jobManagerTask in the jobSpecification. If you do not use jobManagerTask, you will need an external process to monitor when jobs are created, add tasks to the jobs and terminate the jobs ready for the next recurrence. The default is that the schedule does not recur: one job is created, within the startWindow after the doNotRunUntil time, and the schedule is complete as soon as that job finishes. The minimum value is 1 minute. If you specify a lower value, the Batch service rejects the schedule with an error; if you are calling the REST API directly, the HTTP status code is 400 (Bad Request)."
+          "description": "Because a job schedule can have at most one active job under it at any given time, if it is time to create a new job under a job schedule, but the previous job is still running, the Batch service will not create the new job until the previous job finishes. If the previous job does not finish within the startWindow period of the new recurrenceInterval, then no new job will be scheduled for that interval. For recurring jobs, you should normally specify a jobManagerTask in the jobSpecification. If you do not use jobManagerTask, you will need an external process to monitor when jobs are created, add tasks to the jobs and terminate the jobs ready for the next recurrence. The default is that the schedule does not recur: one job is created, within the startWindow after the doNotRunUntil time, and the schedule is complete as soon as that job finishes. The minimum value is 1 minute. If you specify a lower value, the Batch service rejects the schedule with an error; if you are calling the REST API directly, the HTTP status code is 400 (Bad Request)."
         }
       },
       "title": "The schedule according to which jobs will be created"
@@ -10237,8 +10237,8 @@
         "maxWallClockTime": {
           "type": "string",
           "format": "duration",
-          "title": "The maximum elapsed time that the job may run, measured from the time the job is created. If the job does not complete within the time limit, the Batch service terminates it and any tasks that are still running. In this case, the termination reason will be MaxWallClockTimeExpiry.",
-          "description": "If this is not specified, there is no time limit on how long the job may run."
+          "title": "The maximum elapsed time that the job may run, measured from the time the job is created.",
+          "description": "If the job does not complete within the time limit, the Batch service terminates it and any tasks that are still running. In this case, the termination reason will be MaxWallClockTimeExpiry. If this property is not specified, there is no time limit on how long the job may run."
         },
         "maxTaskRetryCount": {
           "type": "integer",
@@ -10247,7 +10247,7 @@
           "description": "Note that this value specifically controls the number of retries. The Batch service will try each task once, and may then retry up to this limit. For example, if the maximum retry count is 3, Batch tries a task up to 4 times (one initial try and 3 retries). If the maximum retry count is 0, the Batch service does not retry tasks. If the maximum retry count is -1, the Batch service retries tasks without limit. The default value is 0 (no retries)."
         }
       },
-      "title": "Specifies the execution constraints for a job."
+      "title": "The execution constraints for a job."
     },
     "ResourceFile": {
       "properties": {
@@ -10340,7 +10340,7 @@
         },
         "exitOptions": {
           "$ref": "#/definitions/ExitOptions",
-          "title": "An exitOptions specifying how the Batch service should respond if the task exits with an exit code in the range start to end (inclusive)."
+          "title": "How the Batch service should respond if the task exits with an exit code in the range start to end (inclusive)."
         }
       },
       "title": "A range of exit codes and how the Batch service should respond to exit codes within that range.",
@@ -10374,8 +10374,8 @@
         "retentionTime": {
           "type": "string",
           "format": "duration",
-          "title": "The minimum time to retain the working directory for the task on the compute node where it ran, from the time it completes execution. After this time, the Batch service may delete the working directory and all its contents.",
-          "description": "The default is infinite, i.e. the working directory will be retained until the compute node is removed or reimaged."
+          "title": "The minimum time to retain the task directory on the compute node where it ran, from the time it completes execution. After this time, the Batch service may delete the task directory and all its contents.",
+          "description": "The default is infinite, i.e. the task directory will be retained until the compute node is removed or reimaged."
         },
         "maxTaskRetryCount": {
           "type": "integer",
@@ -10409,7 +10409,7 @@
             "$ref": "#/definitions/ResourceFile"
           },
           "title": "A list of files that the Batch service will download to the compute node before running the command line.",
-          "description": "Files listed under this element are located in the task's wd directory."
+          "description": "Files listed under this element are located in the task's working directory."
         },
         "environmentSettings": {
           "type": "array",
@@ -10466,7 +10466,7 @@
             "$ref": "#/definitions/ResourceFile"
           },
           "title": "A list of files that the Batch service will download to the compute node before running the command line.",
-          "description": "Files listed under this element are located in the task's wd directory."
+          "description": "Files listed under this element are located in the task's working directory."
         },
         "environmentSettings": {
           "type": "array",
@@ -10515,7 +10515,7 @@
             "$ref": "#/definitions/ResourceFile"
           },
           "title": "A list of files that the Batch service will download to the compute node before running the command line.",
-          "description": "Files listed under this element are located in the task's wd directory."
+          "description": "Files listed under this element are located in the task's working directory."
         },
         "environmentSettings": {
           "type": "array",
@@ -10532,8 +10532,8 @@
         "retentionTime": {
           "type": "string",
           "format": "duration",
-          "title": "The minimum time to retain the working directory for the Job Release task on the compute node. After this time, the Batch service may delete the working directory and all its contents.",
-          "description": "The default is infinite, i.e. the working directory will be retained until the compute node is removed or reimaged."
+          "title": "The minimum time to retain the task directory for the Job Release task on the compute node. After this time, the Batch service may delete the task directory and all its contents.",
+          "description": "The default is infinite, i.e. the task directory will be retained until the compute node is removed or reimaged."
         },
         "runElevated": {
           "type": "boolean",
@@ -10613,7 +10613,7 @@
         "storeLocation": {
           "type": "string",
           "title": "The location of the certificate store on the compute node into which to install the certificate.",
-          "description": "The default value is CurrentUser. This property is applicable only for pools created with cloudServiceConfiguration (PaaS) or virtualMachineConfiguration (IaaS) Windows nodes. For Linux compute nodes, the certificates are stored in a directory inside the task working directory and an environment variable AZ_BATCH_CERTIFICATES_DIR is supplied to the task to query for this location. For certificates with visibility of remoteuser, a certs directory is created in the user's home directory (e.g., /home/<user-name>/certs) where certificates are placed.",
+          "description": "The default value is CurrentUser. This property is applicable only for pools configured with Windows nodes (that is, created with cloudServiceConfiguration, or with virtualMachineConfiguration using a Windows image reference). For Linux compute nodes, the certificates are stored in a directory inside the task working directory and an environment variable AZ_BATCH_CERTIFICATES_DIR is supplied to the task to query for this location. For certificates with visibility of remoteuser, a certs directory is created in the user's home directory (e.g., /home/<user-name>/certs) where certificates are placed.",
           "enum": [
             "currentuser",
             "localmachine",
@@ -10624,7 +10624,7 @@
         "storeName": {
           "type": "string",
           "title": "The name of the certificate store on the compute node into which to install the certificate.",
-          "description": "The default value is My. This property is applicable only for pools created with cloudServiceConfiguration (PaaS) or virtualMachineConfiguration (IaaS) Windows nodes."
+          "description": "The default value is My. This property is applicable only for pools configured with Windows nodes (that is, created with cloudServiceConfiguration, or with virtualMachineConfiguration using a Windows image reference)."
         },
         "visibility": {
           "type": "array",
@@ -10675,12 +10675,12 @@
         "cloudServiceConfiguration": {
           "$ref": "#/definitions/CloudServiceConfiguration",
           "title": "The cloud service configuration for the pool.",
-          "description": "This property must be specified if the pool needs to be created with Azure PaaS VMs. This property and VirtualMachineConfiguration are mutually exclusive and one of the properties must be specified. If neither is specified then the Batch service returns an error; if you are calling the REST API directly, the HTTP status code is 400 (Bad Request)."
+          "description": "This property must be specified if the pool needs to be created with Azure PaaS VMs. This property and virtualMachineConfiguration are mutually exclusive and one of the properties must be specified. If neither is specified then the Batch service returns an error; if you are calling the REST API directly, the HTTP status code is 400 (Bad Request)."
         },
         "virtualMachineConfiguration": {
           "$ref": "#/definitions/VirtualMachineConfiguration",
           "title": "The virtual machine configuration for the pool.",
-          "description": "This property must be specified if the pool needs to be created with Azure IaaS VMs. This property and CloudServiceConfiguration are mutually exclusive and one of the properties must be specified. If neither is specified then the Batch service returns an error; if you are calling the REST API directly, the HTTP status code is 400 (Bad Request)."
+          "description": "This property must be specified if the pool needs to be created with Azure IaaS VMs. This property and cloudServiceConfiguration are mutually exclusive and one of the properties must be specified. If neither is specified then the Batch service returns an error; if you are calling the REST API directly, the HTTP status code is 400 (Bad Request)."
         },
         "maxTasksPerNode": {
           "type": "integer",
@@ -11097,7 +11097,7 @@
         "id": {
           "type": "string",
           "title": "A string that uniquely identifies the schedule within the account.",
-          "description": "The id can contain any combination of alphanumeric characters including hyphens and underscores, and cannot contain more than 64 characters. The id is case-preserving and case-insensitive (that is, you may not have two ids within an account that differ only by case)."
+          "description": "The ID can contain any combination of alphanumeric characters including hyphens and underscores, and cannot contain more than 64 characters. The id is case-preserving and case-insensitive (that is, you may not have two ids within an account that differ only by case)."
         },
         "displayName": {
           "type": "string",
@@ -11950,7 +11950,7 @@
         "id": {
           "type": "string",
           "title": "A string that uniquely identifies the pool within the account.",
-          "description": "The ID can contain any combination of alphanumeric characters including hyphens and underscores, and cannot contain more than 64 characters. The ID is case-preserving and case-insensitive (that is, you may not have two IDs within an account that differ only by case)."
+          "description": "The ID can contain any combination of alphanumeric characters including hyphens and underscores, and cannot contain more than 64 characters. The ID is case-preserving and case-insensitive (that is, you may not have two pool IDs within an account that differ only by case)."
         },
         "displayName": {
           "type": "string",
